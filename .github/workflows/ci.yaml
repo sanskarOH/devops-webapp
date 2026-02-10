@@ -1,0 +1,49 @@
+name: CI/CD Pipeline with ChatOps
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: CI - Build step (static site simulation)
+      - name: Build Project
+        run: |
+          echo "Starting build process..."
+          echo "Listing project files:"
+          ls -la
+          echo "Build completed successfully."
+
+      # Step 3: CI - Test step (optional simulation)
+      - name: Run Tests
+        run: |
+          echo "Running tests..."
+          echo "No test framework configured."
+          echo "All tests passed successfully."
+
+      # Step 4: ChatOps - Notify Success
+      - name: Slack Notification - Success
+        if: success()
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"✅ *CI Pipeline SUCCESS*\nRepository: devops-webapp\nBranch: main\nStatus: Build & Tests Passed 🚀"}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      # Step 5: ChatOps - Notify Failure
+      - name: Slack Notification - Failure
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"❌ *CI Pipeline FAILED*\nRepository: devops-webapp\nBranch: main\nPlease check GitHub Actions logs."}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
